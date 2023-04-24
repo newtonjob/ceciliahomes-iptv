@@ -31,12 +31,14 @@ class SyncRooms
             'versionText' => '2.7.0.93',
             'timeMills'   => Date::make($room->created_at)->unix(),
         ])->when($room->current_reservation, fn ($collection, $reservation) => $collection->merge([
+            'enable'        => true,
             'money'         => 0,
             'checkPerson'   => $name = $reservation->user->name,
             'checkinTime'   => Date::make($reservation->checkin_at)->unix(),
             'welcomeWord'   => $welcome = (string) view('welcome', compact('name')),
             'welcomeWordEn' => $welcome
         ]), fn ($collection) => $collection->merge([
+            'enable'        => false,
             'money'         => 0,
             'checkPerson'   => '',
             'checkinTime'   => 0,
