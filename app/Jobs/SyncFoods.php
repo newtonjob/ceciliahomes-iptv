@@ -24,10 +24,11 @@ class SyncFoods
 
         collect($products)->each(function ($product) {
             Food::updateOrCreate(['id' => $product->id], [
-                'name'    => $product->name,
-                'price'   => $product->price,
-                'content' => $product->description,
-                'typeId'  => $product->category->id ?? 0,
+                'name'      => $product->name,
+                'price'     => $product->price,
+                'content'   => $product->description,
+                'imagePath' => $product->image->src ?? '',
+                'typeId'    => $product->category->id ?? 0,
             ]);
         });
     }
