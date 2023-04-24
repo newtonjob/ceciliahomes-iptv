@@ -25,8 +25,6 @@ class SyncRooms
 
     public function prepareForUpdate($room): array
     {
-        // UPDATE `rooms` SET created_at = updated_at;
-
         return collect([
             'name'        => $room->name,
             'versionCode' => '20700093',
