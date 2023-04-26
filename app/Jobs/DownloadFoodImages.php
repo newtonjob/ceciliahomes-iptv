@@ -17,12 +17,13 @@ class DownloadFoodImages
     {
         Food::needsImageDownload()->each(function (Food $food) {
             $basename = basename($food->imagePath);
+            $path     = "res/custom/food/$basename";
 
-            File::put("/usr/local/mstomcat/webapps/iptv2/res/custom/food/$basename",
+            File::put("/usr/local/mstomcat/webapps/iptv2/$path",
                 file_get_contents($food->imagePath)
             );
 
-            $food->update(['imagePath' => "../res/custom/food/$basename"]);
+            $food->update(['imagePath' => "../$path"]);
         });
     }
 }
