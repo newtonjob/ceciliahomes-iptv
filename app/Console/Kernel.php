@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Jobs\DownloadFoodImages;
 use App\Jobs\SyncFoods;
 use App\Jobs\SyncRooms;
 use Illuminate\Console\Scheduling\Schedule;
@@ -16,6 +17,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->job(SyncRooms::class)->everyMinute();
         $schedule->job(SyncFoods::class)->everyMinute();
+        $schedule->job(DownloadFoodImages::class)->everyMinute();
     }
 
     /**
