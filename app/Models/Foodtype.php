@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class FoodType extends Model
+class Foodtype extends Model
 {
     /**
      * The table associated with the model.
