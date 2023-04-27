@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Food;
 use App\Models\FoodOrder;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -17,20 +18,30 @@ class SyncOrders
      */
     public function handle(): void
     {
-        $syncedOrders = Cache::get('synced-orders', collect());
-
-        FoodOrder::with('foods')->whereKeyNot($syncedOrders)
-            ->each(function (FoodOrder $foodOrder) use (&$syncedOrders) {
-                $products = $foodOrder->foods->mapWithKeys(fn (Food $food) => [
-                    $food->id => [
-                        'price'    => $food->price,
-                        'quantity' => $food->pivot->count,
-                    ]
+        FoodOrder::with('foods')->whereKeyNot(cache('synced-orders'))->forPage()
+            ->each(function (FoodOrder $foodOrder) {
+                Http::cecilia()->post("/rooms/{$foodOrder->clientId}/orders", [
+                    'products' => $this->prepareProductsPayload($foodOrder)
                 ]);
 
-                Http::cecilia()->post("/rooms/{$foodOrder->clientId}/orders", ['products' => $products]);
-
-                Cache::put('synced-orders', $syncedOrders = $syncedOrders->add($foodOrder->id));
+                $this->markAsSynced($foodOrder);
             });
+    }
+
+    public function prepareProductsPayload(FoodOrder $foodOrder): Collection
+    {
+        return $foodOrder->foods->mapWithKeys(fn (Food $food) => [
+            $food->id => [
+                'price'    => $food->price,
+                'quantity' => $food->pivot->count,
+            ]
+        ]);
+    }
+
+    public function markAsSynced(FoodOrder $foodOrder): void
+    {
+        Cache::put('synced-orders',
+            Cache::get('synced-orders', collect())->add($foodOrder->id)
+        );
     }
 }
