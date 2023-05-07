@@ -18,7 +18,7 @@ class SyncOrders
      */
     public function handle(): void
     {
-        FoodOrder::with('foods')->whereKeyNot(cache('synced-orders'))->forPage()
+        FoodOrder::with('foods')->whereKeyNot(cache('synced-orders'))
             ->each(function (FoodOrder $foodOrder) {
                 Http::cecilia()->post("/rooms/{$foodOrder->clientId}/orders", [
                     'products' => $this->prepareProductsPayload($foodOrder)
@@ -43,5 +43,12 @@ class SyncOrders
         Cache::put('synced-orders',
             Cache::get('synced-orders', collect())->add($foodOrder->id)
         );
+
+        $foodOrder->update([
+            'status'       => 3,
+            'responseTime' => $foodOrder->orderTime,
+            'preparedTime' => $foodOrder->orderTime,
+            'finishTime'   => $foodOrder->orderTime,
+        ]);
     }
 }
