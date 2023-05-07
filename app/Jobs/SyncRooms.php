@@ -20,6 +20,8 @@ class SyncRooms
 
         collect($response->data)->each(function ($room) {
             Client::updateOrCreate(['id' => $room->id], $this->prepareForUpdate($room));
+
+            $this->deleteAnyExistingClientIfNecessaryFor($room);
         });
     }
 
@@ -28,6 +30,7 @@ class SyncRooms
         return collect([
             'name'        => $room->name,
             'versionCode' => '20700093',
+            'mac'         => $room->meta->iptv_mac ?? '',
             'versionText' => '2.7.0.93',
             'timeMills'   => Date::make($room->created_at)->unix(),
         ])->when($room->current_reservation, fn ($collection, $reservation) => $collection->merge([
@@ -45,5 +48,12 @@ class SyncRooms
             'welcomeWord'   => '',
             'welcomeWordEn' => ''
         ]))->all();
+    }
+
+    public function deleteAnyExistingClientIfNecessaryFor(object $room): void
+    {
+        if ($mac = data_get($room, 'meta.iptv_mac')) {
+            Client::whereKeyNot($room->id)->whereMac($mac)->delete();
+        }
     }
 }
