@@ -26,7 +26,7 @@ class SyncFoods
             Food::updateOrCreate(['id' => $product->id], [
                 'name'      => $product->name,
                 'price'     => $product->price,
-                'content'   => $product->description,
+                'content'   => $product->description ?? '',
                 'imagePath' => $product->image->src ?? '',
                 'typeId'    => $product->category->id ?? 0,
             ]);
