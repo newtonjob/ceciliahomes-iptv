@@ -18,7 +18,9 @@ class SyncOrders
      */
     public function handle(): void
     {
-        FoodOrder::with('foods')->whereKeyNot(cache('synced-orders'))
+        FoodOrder::with('foods')
+            ->where('clientId', '<=', 30) // Todo: Find a way to avoid this!
+            ->whereKeyNot(cache('synced-orders'))
             ->each(function (FoodOrder $foodOrder) {
                 Http::cecilia()->post("/rooms/{$foodOrder->clientId}/orders", [
                     'products' => $this->prepareProductsPayload($foodOrder)
