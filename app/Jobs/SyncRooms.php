@@ -35,7 +35,7 @@ class SyncRooms
             'timeMills'   => Date::make($room->created_at)->unix(),
         ])->when($room->current_reservation, fn ($collection, $reservation) => $collection->merge([
             'enable'        => true,
-            'money'         => 0,
+            'money'         => $reservation->refundable,
             'checkPerson'   => $name = $reservation->user->name,
             'checkinTime'   => Date::make($reservation->checkin_at)->unix(),
             'welcomeWord'   => $welcome = (string) view('welcome', compact('name')),
