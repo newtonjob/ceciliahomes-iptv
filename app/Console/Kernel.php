@@ -6,6 +6,7 @@ use App\Jobs\DownloadFoodImages;
 use App\Jobs\SyncFoods;
 use App\Jobs\SyncOrders;
 use App\Jobs\SyncRooms;
+use App\Jobs\SyncVideos;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -20,6 +21,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(SyncFoods::class)->everyMinute();
         $schedule->job(DownloadFoodImages::class)->everyMinute();
         $schedule->job(SyncOrders::class)->everyMinute();
+        $schedule->job(SyncVideos::class)->everyMinute();
     }
 
     /**
