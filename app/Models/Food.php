@@ -14,11 +14,6 @@ class Food extends Model
     protected $table = 'food';
 
     /**
-     * The attributes that aren't mass assignable.
-     */
-    protected $guarded = [];
-
-    /**
      * Indicates if the model should be timestamped.
      */
     public $timestamps = false;
