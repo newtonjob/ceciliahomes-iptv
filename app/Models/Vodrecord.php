@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Date;
 
 class Vodrecord extends Model
 {
@@ -16,6 +17,13 @@ class Vodrecord extends Model
      * Indicates if the model should be timestamped.
      */
     public $timestamps = false;
+
+    public function syncKey()
+    {
+        $date = Date::parse($this->date)->toDateString();
+
+        return $this->clientId.$this->name.$date;
+    }
 
     public function vod(): BelongsTo
     {

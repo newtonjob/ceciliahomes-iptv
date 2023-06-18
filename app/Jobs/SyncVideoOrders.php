@@ -20,6 +20,8 @@ class SyncVideoOrders
             ->whereRelation('vod', 'price', '>', 0)
             ->where('clientId', '<=', 30) // Todo: Find a way to avoid this!
             ->whereKeyNot(cache('synced-vodrecord'))
+            ->get()
+            ->reject($this->alreadySyncedForSameDate(...))
             ->each(function (Vodrecord $vodrecord) {
                 Http::cecilia()->post("/rooms/{$vodrecord->clientId}/orders", [
                     'products'     => $this->prepareProductsPayload($vodrecord),
@@ -45,5 +47,20 @@ class SyncVideoOrders
         Cache::put('synced-vodrecord',
             Cache::get('synced-vodrecord', collect())->add($vodrecord->id)
         );
+
+        Cache::put('synced-vodrecord-date',
+            Cache::get('synced-vodrecord-date', collect())->add($vodrecord->syncKey())
+        );
+    }
+
+    public function alreadySyncedForSameDate(Vodrecord $vodrecord)
+    {
+        if (Cache::get('synced-vodrecord-date', collect())->contains($vodrecord->syncKey())) {
+            $this->markAsSynced($vodrecord);
+
+            return true;
+        }
+
+        return false;
     }
 }
